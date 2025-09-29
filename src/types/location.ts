@@ -25,7 +25,7 @@ export interface Offer {
   title: string;
   description: string;
   discount: string;
-  category: 'dining' | 'entertainment' | 'wellness' | 'shopping' | 'travel';
+  category: 'dining' | 'entertainment' | 'wellness' | 'shopping' | 'travel' | 'fitness' | 'books' | 'electronics' | 'beauty';
   brand: string;
   image: string;
   validUntil: Date;

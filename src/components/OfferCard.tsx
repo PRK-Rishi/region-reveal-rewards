@@ -10,9 +10,10 @@ interface OfferCardProps {
   onClaim?: (offerId: string) => void;
   className?: string;
   style?: React.CSSProperties;
+  isClaimed?: boolean;
 }
 
-const OfferCard: React.FC<OfferCardProps> = ({ offer, onClaim, className = '', style }) => {
+const OfferCard: React.FC<OfferCardProps> = ({ offer, onClaim, className = '', style, isClaimed = false }) => {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'dining': return '🍽️';
@@ -20,6 +21,10 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onClaim, className = '', s
       case 'wellness': return '🧘';
       case 'shopping': return '🛍️';
       case 'travel': return '✈️';
+      case 'fitness': return '💪';
+      case 'books': return '📚';
+      case 'electronics': return '📱';
+      case 'beauty': return '💄';
       default: return '🎁';
     }
   };
@@ -31,6 +36,10 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onClaim, className = '', s
       case 'wellness': return 'bg-green-500/20 text-green-400';
       case 'shopping': return 'bg-pink-500/20 text-pink-400';
       case 'travel': return 'bg-blue-500/20 text-blue-400';
+      case 'fitness': return 'bg-red-500/20 text-red-400';
+      case 'books': return 'bg-indigo-500/20 text-indigo-400';
+      case 'electronics': return 'bg-cyan-500/20 text-cyan-400';
+      case 'beauty': return 'bg-rose-500/20 text-rose-400';
       default: return 'bg-primary/20 text-primary';
     }
   };
@@ -98,11 +107,16 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onClaim, className = '', s
           
           <Button 
             onClick={() => onClaim?.(offer.id)}
-            className="w-full bg-gradient-primary hover:opacity-90 transition-opacity shadow-elegant"
+            disabled={isClaimed}
+            className={`w-full transition-opacity shadow-elegant ${
+              isClaimed 
+                ? 'bg-green-500/20 text-green-400 cursor-not-allowed' 
+                : 'bg-gradient-primary hover:opacity-90'
+            }`}
             size="lg"
           >
             <MapPin className="w-4 h-4 mr-2" />
-            Claim Offer
+            {isClaimed ? 'Already Claimed' : 'Claim Offer'}
           </Button>
         </div>
       </CardContent>

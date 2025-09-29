@@ -7,10 +7,10 @@ const mockZones: GeofenceZone[] = [
     id: 'coimbatore',
     name: 'Coimbatore',
     bounds: {
-      north: 11.1085,
-      south: 10.9435,
-      east: 77.0890,
-      west: 76.8328
+      north: 11.2500,
+      south: 10.8500,
+      east: 77.1500,
+      west: 76.7000
     },
     center: { latitude: 11.0168, longitude: 76.9558 }
   },
@@ -66,6 +66,54 @@ const mockOffers: Offer[] = [
   },
   {
     id: '3',
+    title: 'Coffee House Special',
+    description: 'Free coffee with any pastry purchase',
+    discount: 'FREE COFFEE',
+    category: 'dining',
+    brand: 'Café Delight',
+    image: '/api/placeholder/300/200',
+    validUntil: new Date('2024-12-31'),
+    zoneId: 'coimbatore',
+    isActive: true
+  },
+  {
+    id: '4',
+    title: 'Fitness Membership Deal',
+    description: '3 months membership at premium gym',
+    discount: '30% OFF',
+    category: 'fitness',
+    brand: 'PowerFit Gym',
+    image: '/api/placeholder/300/200',
+    validUntil: new Date('2024-12-31'),
+    zoneId: 'coimbatore',
+    isActive: true
+  },
+  {
+    id: '5',
+    title: 'Designer Shopping Spree',
+    description: 'Exclusive access to premium fashion collections',
+    discount: '60% OFF',
+    category: 'shopping',
+    brand: 'Elite Fashion Hub',
+    image: '/api/placeholder/300/200',
+    validUntil: new Date('2024-12-31'),
+    zoneId: 'coimbatore',
+    isActive: true
+  },
+  {
+    id: '6',
+    title: 'Book Store Bonanza',
+    description: 'Buy 2 books and get 1 free bestseller',
+    discount: 'BUY 2 GET 1',
+    category: 'books',
+    brand: 'Literary Haven',
+    image: '/api/placeholder/300/200',
+    validUntil: new Date('2024-12-31'),
+    zoneId: 'coimbatore',
+    isActive: true
+  },
+  {
+    id: '7',
     title: 'Fine Dining Deluxe',
     description: 'Michelin-recommended 5-course meal experience',
     discount: 'FREE DESSERT',
@@ -77,7 +125,7 @@ const mockOffers: Offer[] = [
     isActive: true
   },
   {
-    id: '4',
+    id: '8',
     title: 'VIP Movie Experience',
     description: 'Premium cinema with luxury seating and snacks',
     discount: '35% OFF',
@@ -89,12 +137,24 @@ const mockOffers: Offer[] = [
     isActive: true
   },
   {
-    id: '5',
-    title: 'Designer Shopping Spree',
-    description: 'Exclusive access to premium fashion collections',
-    discount: '60% OFF',
-    category: 'shopping',
-    brand: 'Elite Fashion Hub',
+    id: '9',
+    title: 'Tech Gadget Sale',
+    description: 'Latest smartphones and accessories',
+    discount: '25% OFF',
+    category: 'electronics',
+    brand: 'TechWorld',
+    image: '/api/placeholder/300/200',
+    validUntil: new Date('2024-12-31'),
+    zoneId: 'coimbatore',
+    isActive: true
+  },
+  {
+    id: '10',
+    title: 'Beauty Makeover',
+    description: 'Complete beauty treatment package',
+    discount: '45% OFF',
+    category: 'beauty',
+    brand: 'Glamour Studio',
     image: '/api/placeholder/300/200',
     validUntil: new Date('2024-12-31'),
     zoneId: 'coimbatore',

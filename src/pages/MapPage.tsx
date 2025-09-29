@@ -9,7 +9,7 @@ import { MapPin, Layers, Navigation2, Zap } from 'lucide-react';
 
 const MapPage: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const { location } = useGeolocation();
+  const { location, getCurrentLocation } = useGeolocation();
   const { getAllZones, activeZone, availableOffers } = useGeofencing(location);
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
   
@@ -47,7 +47,7 @@ const MapPage: React.FC = () => {
         </div>
 
         {/* Current Location Status */}
-        {location && (
+        {location ? (
           <Card className="glass border-primary/20">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -56,17 +56,45 @@ const MapPage: React.FC = () => {
                     <Navigation2 className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="font-semibold">Your Location</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
+                    <h3 className="font-semibold">Your Real-Time Location</h3>
+                    <p className="text-sm text-muted-foreground font-mono">
+                      {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Accuracy: ±{location.accuracy ? Math.round(location.accuracy) : 'unknown'}m
                     </p>
                   </div>
                 </div>
                 {activeZone && (
                   <Badge className="bg-green-500/20 text-green-400 animate-pulse-glow">
-                    In {activeZone.name}
+                    Active in {activeZone.name}
                   </Badge>
                 )}
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="glass border-orange-500/20 bg-orange-500/10">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-orange-500/20 rounded-full flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-orange-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-orange-400">Location Required</h3>
+                    <p className="text-sm text-orange-300">
+                      Enable location access to see your real-time position on the map
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={getCurrentLocation}
+                  className="bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 border-orange-500/30"
+                  variant="outline"
+                >
+                  Enable Location
+                </Button>
               </div>
             </CardContent>
           </Card>

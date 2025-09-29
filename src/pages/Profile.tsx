@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useGeofencing } from '@/hooks/useGeofencing';
+import { useClaimedOffers } from '@/hooks/useClaimedOffers';
 import Navigation from '@/components/Navigation';
+import OfferCard from '@/components/OfferCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   User, 
   MapPin, 
@@ -23,28 +26,18 @@ import {
 const Profile: React.FC = () => {
   const { location, permission } = useGeolocation();
   const { zoneHistory, availableOffers, activeZone } = useGeofencing(location);
-  const [notifications, setNotifications] = useState(true);
+  const { claimedOffers, totalClaimed } = useClaimedOffers();
   const [locationSharing, setLocationSharing] = useState(true);
-  const [personalizedOffers, setPersonalizedOffers] = useState(true);
 
   // Mock user data
   const userData = {
     name: 'Premium User',
     email: 'user@citytreats.com',
     memberSince: new Date('2024-01-15'),
-    totalOffersClaimed: 23,
-    favoriteCategory: 'dining',
-    tier: 'Gold'
+    totalOffersClaimed: totalClaimed,
+    favoriteCategory: 'dining'
   };
 
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'Gold': return 'text-accent bg-accent/20';
-      case 'Silver': return 'text-gray-400 bg-gray-400/20';
-      case 'Platinum': return 'text-purple-400 bg-purple-400/20';
-      default: return 'text-primary bg-primary/20';
-    }
-  };
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', {
@@ -81,10 +74,6 @@ const Profile: React.FC = () => {
                 <h2 className="text-2xl font-bold">{userData.name}</h2>
                 <p className="text-muted-foreground">{userData.email}</p>
                 <div className="flex items-center gap-2 mt-2">
-                  <Badge className={`${getTierColor(userData.tier)} border-0 font-medium`}>
-                    <Trophy className="w-3 h-3 mr-1" />
-                    {userData.tier} Member
-                  </Badge>
                   <Badge className="bg-primary/20 text-primary border-0">
                     Member since {formatDate(userData.memberSince)}
                   </Badge>
@@ -99,7 +88,7 @@ const Profile: React.FC = () => {
           <Card className="glass text-center border-primary/20">
             <CardContent className="p-4">
               <Gift className="w-8 h-8 text-accent mx-auto mb-2" />
-              <div className="text-2xl font-bold text-accent">{userData.totalOffersClaimed}</div>
+              <div className="text-2xl font-bold text-accent">{totalClaimed}</div>
               <div className="text-xs text-muted-foreground">Offers Claimed</div>
             </CardContent>
           </Card>
@@ -152,31 +141,14 @@ const Profile: React.FC = () => {
                 />
               </div>
               
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium">Push Notifications</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Get notified about new offers in your area
+              {!locationSharing && (
+                <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg">
+                  <p className="text-sm text-orange-400 flex items-center gap-2">
+                    <MapPin className="w-4 h-4" />
+                    Location access is required to claim offers and see nearby deals.
                   </p>
                 </div>
-                <Switch 
-                  checked={notifications}
-                  onCheckedChange={setNotifications}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium">Personalized Offers</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Receive offers based on your preferences
-                  </p>
-                </div>
-                <Switch 
-                  checked={personalizedOffers}
-                  onCheckedChange={setPersonalizedOffers}
-                />
-              </div>
+              )}
 
               {/* Current Location Status */}
               {location && (
@@ -200,45 +172,90 @@ const Profile: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Activity History */}
+          {/* Activity & Claimed Offers */}
           <Card className="glass border-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <History className="w-5 h-5" />
-                Recent Activity
+                Activity & Offers
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-3 max-h-64 overflow-y-auto">
-                {/* Zone History */}
-                {zoneHistory.length > 0 ? (
-                  zoneHistory.slice(-5).reverse().map((zoneId, index) => (
-                    <div key={`${zoneId}-${index}`} className="flex items-center gap-3 p-3 glass rounded-lg">
-                      <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                        <MapPin className="w-4 h-4 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">Visited {zoneId}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {index === 0 ? 'Currently here' : `${index + 1} visit${index > 0 ? 's' : ''} ago`}
+            <CardContent>
+              <Tabs defaultValue="activity" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 glass">
+                  <TabsTrigger value="activity">Recent Activity</TabsTrigger>
+                  <TabsTrigger value="claimed">Claimed Offers</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="activity" className="space-y-4 mt-4">
+                  <div className="space-y-3 max-h-64 overflow-y-auto">
+                    {zoneHistory.length > 0 ? (
+                      zoneHistory.slice(-5).reverse().map((zoneId, index) => (
+                        <div key={`${zoneId}-${index}`} className="flex items-center gap-3 p-3 glass rounded-lg">
+                          <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                            <MapPin className="w-4 h-4 text-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-sm">Visited {zoneId}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {index === 0 ? 'Currently here' : `${index + 1} visit${index > 0 ? 's' : ''} ago`}
+                            </p>
+                          </div>
+                          {index === 0 && activeZone?.id === zoneId && (
+                            <Badge className="bg-green-500/20 text-green-400 text-xs">
+                              Active
+                            </Badge>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-4xl mb-2">📍</div>
+                        <p className="text-muted-foreground text-sm">
+                          No location history yet. Visit a premium zone to get started!
                         </p>
                       </div>
-                      {index === 0 && activeZone?.id === zoneId && (
-                        <Badge className="bg-green-500/20 text-green-400 text-xs">
-                          Active
-                        </Badge>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <div className="text-4xl mb-2">📍</div>
-                    <p className="text-muted-foreground text-sm">
-                      No location history yet. Visit a premium zone to get started!
-                    </p>
+                    )}
                   </div>
-                )}
-              </div>
+                </TabsContent>
+                
+                <TabsContent value="claimed" className="space-y-4 mt-4">
+                  <div className="max-h-64 overflow-y-auto">
+                    {claimedOffers.length > 0 ? (
+                      <div className="space-y-3">
+                        {claimedOffers.slice(0, 3).map((offer) => (
+                          <div key={offer.claimId} className="p-3 glass rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <h4 className="font-medium text-sm">{offer.title}</h4>
+                                <p className="text-xs text-muted-foreground">{offer.brand}</p>
+                                <p className="text-xs text-green-400 mt-1">
+                                  Claimed on {offer.claimedAt.toLocaleDateString()}
+                                </p>
+                              </div>
+                              <Badge className="bg-green-500/20 text-green-400 text-xs">
+                                {offer.discount}
+                              </Badge>
+                            </div>
+                          </div>
+                        ))}
+                        {claimedOffers.length > 3 && (
+                          <p className="text-xs text-center text-muted-foreground pt-2">
+                            +{claimedOffers.length - 3} more offers claimed
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-4xl mb-2">🎁</div>
+                        <p className="text-muted-foreground text-sm">
+                          No offers claimed yet. Start exploring to claim your first offer!
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         </div>

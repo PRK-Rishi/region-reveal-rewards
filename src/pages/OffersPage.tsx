@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useGeofencing } from '@/hooks/useGeofencing';
+import { useClaimedOffers } from '@/hooks/useClaimedOffers';
 import { useToast } from '@/hooks/use-toast';
 import Navigation from '@/components/Navigation';
 import LocationStatus from '@/components/LocationStatus';
@@ -15,6 +16,7 @@ import { Input } from '@/components/ui/input';
 const OffersPage: React.FC = () => {
   const { location } = useGeolocation();
   const { activeZone, availableOffers, isInGeofence, getOffersByCategory } = useGeofencing(location);
+  const { claimOffer, isOfferClaimed } = useClaimedOffers();
   const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,11 +25,23 @@ const OffersPage: React.FC = () => {
   const handleClaimOffer = (offerId: string) => {
     const offer = availableOffers.find(o => o.id === offerId);
     if (offer) {
-      toast({
-        title: "Offer Claimed! 🎊",
-        description: `${offer.title} - Redirecting to brand app...`,
-        duration: 5000,
-      });
+      if (isOfferClaimed(offerId)) {
+        toast({
+          title: "Already Claimed! ⚠️",
+          description: "You have already claimed this offer.",
+          duration: 3000,
+        });
+        return;
+      }
+
+      const success = claimOffer(offer);
+      if (success) {
+        toast({
+          title: "Offer Claimed! 🎊",
+          description: `${offer.title} - Redirecting to brand app...`,
+          duration: 5000,
+        });
+      }
     }
   };
 
@@ -175,6 +189,7 @@ const OffersPage: React.FC = () => {
                     key={offer.id}
                     offer={offer}
                     onClaim={handleClaimOffer}
+                    isClaimed={isOfferClaimed(offer.id)}
                     className="animate-slide-up"
                     style={{ animationDelay: `${index * 0.1}s` }}
                   />
