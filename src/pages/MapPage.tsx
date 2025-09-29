@@ -19,9 +19,14 @@ const MapPage: React.FC = () => {
   useEffect(() => {
     if (!mapContainer.current) return;
 
+    console.log('Map initialization - location available:', !!location);
+    if (location) {
+      console.log('User location:', location);
+    }
+    
     // This would be replaced with actual Mapbox initialization
     console.log('Map would initialize here with Mapbox GL JS');
-  }, []);
+  }, [location]);
 
   const handleZoneClick = (zoneId: string) => {
     setSelectedZone(zoneId);

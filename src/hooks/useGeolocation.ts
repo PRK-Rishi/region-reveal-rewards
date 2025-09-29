@@ -31,17 +31,19 @@ export const useGeolocation = () => {
 
   const getCurrentLocation = useCallback(() => {
     if (!navigator.geolocation) {
+      console.error('Geolocation not supported');
       setError('Geolocation is not supported by this browser');
       return;
     }
 
+    console.log('Requesting location...');
     setLoading(true);
     setError(null);
 
     const options: PositionOptions = {
       enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 60000 // 1 minute cache
+      timeout: 15000,
+      maximumAge: 0 // No cache for fresh location
     };
 
     navigator.geolocation.getCurrentPosition(
@@ -51,6 +53,7 @@ export const useGeolocation = () => {
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy
         };
+        console.log('Location received:', newLocation);
         setLocation(newLocation);
         setLoading(false);
         setPermission(prev => ({ ...prev, granted: true, denied: false }));
@@ -69,6 +72,7 @@ export const useGeolocation = () => {
             errorMessage = 'Location request timed out';
             break;
         }
+        console.error('Location error:', errorMessage, err);
         setError(errorMessage);
         setLoading(false);
       },
@@ -106,7 +110,11 @@ export const useGeolocation = () => {
 
   useEffect(() => {
     checkPermission();
-  }, [checkPermission]);
+    // Auto-request location if supported
+    if (navigator.geolocation) {
+      getCurrentLocation();
+    }
+  }, [checkPermission, getCurrentLocation]);
 
   return {
     location,

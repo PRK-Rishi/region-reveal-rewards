@@ -7,10 +7,10 @@ const mockZones: GeofenceZone[] = [
     id: 'coimbatore',
     name: 'Coimbatore',
     bounds: {
-      north: 11.2500,
-      south: 10.8500,
-      east: 77.1500,
-      west: 76.7000
+      north: 11.3000,
+      south: 10.7000,
+      east: 77.2000,
+      west: 76.6000
     },
     center: { latitude: 11.0168, longitude: 76.9558 }
   },
@@ -180,9 +180,28 @@ export const useGeofencing = (location: Location | null) => {
   const [zoneHistory, setZoneHistory] = useState<string[]>([]);
 
   const currentZone = useMemo(() => {
-    if (!location) return null;
+    if (!location) {
+      console.log('No location available for geofencing');
+      return null;
+    }
     
-    return mockZones.find(zone => isLocationInZone(location, zone)) || null;
+    console.log('Checking location against zones:', {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      zones: mockZones.map(z => z.name)
+    });
+    
+    const foundZone = mockZones.find(zone => {
+      const inZone = isLocationInZone(location, zone);
+      console.log(`Location ${inZone ? 'IS' : 'IS NOT'} in ${zone.name}:`, {
+        location: { lat: location.latitude, lng: location.longitude },
+        bounds: zone.bounds
+      });
+      return inZone;
+    });
+    
+    console.log('Found zone:', foundZone?.name || 'None');
+    return foundZone || null;
   }, [location]);
 
   useEffect(() => {
